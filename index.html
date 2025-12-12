@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acontece HUB - Soluções Integradas</title>
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --hub-center-size: 200px;
+            --icon-width: 100px;
+            --icon-height: 62px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        /* 1. Linha arco-iris */
+        .color-bar {
+            width: 100%;
+            height: 20px;
+            display: flex;
+            position: relative;
+            z-index: 1000;
+        }
+        .color-bar > div { flex: 1; }
+
+        /* 2. Header */
+        .header-logo {
+            text-align: center;
+            padding: 200px 20px 40px; 
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-logo img {
+            max-width: 480px;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 3. Sub-titulo */
+        .tagline {
+            color: #006EA7;
+            font-size: 22px;
+            margin-top: 15px;
+            margin-bottom: 100px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* 4. Sub-titulo hub */
+        .hub-subtitle {
+            text-align: center;
+            color: #006EA7;
+            font-size: 22px; 
+            font-weight: 500;
+            margin-bottom: 70px;
+            position: relative;
+            z-index: 20;
+            width: 100%;
+        }
+
+        /* 5. Hub radial */
+        .hub-section {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            background: var(--bg-color); 
+            padding: 20px 0;
+        }
+
+        /* Efeito de Ondas (Background Pulsante) */
+        .ripple-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glow Central */
+        .center-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 680px; /* Aumentado levemente conforme ajuste anterior */
+            height: 680px;
+            z-index: -1;
+
+            background: radial-gradient(circle,
+                rgba(255, 255, 255, 1) 0%,     
+                rgba(225, 245, 254, 1) 30%,    
+                rgba(179, 229, 252, 0.9) 50%,  
+                rgba(129, 212, 250, 0.5) 65%,  
+                rgba(100, 168, 255, 0.0) 75%   
+            );
+
+            filter: blur(60px); /* Ajustado para deixar mais denso */
+            opacity: 1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 7px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); 
+            border-radius: 50%;
+            opacity: 0;
+            animation: ripple-anim 9s linear infinite;
+        }
+
+        .ripple:nth-child(2) { animation-delay: 0s; }
+        .ripple:nth-child(3) { animation-delay: 3s; }
+        .ripple:nth-child(4) { animation-delay: 6s; }
+
+        @keyframes ripple-anim {
+            0% { width: 250px; height: 250px; opacity: 0; border-width: 4px; }
+            10% { opacity: 0.8; }
+            100% { width: 850px; height: 850px; opacity: 0; border-width: 0px; }
+        }
+
+        /* Container Principal do Hub */
+        .hub-container {
+            position: relative;
+            width: 520px;
+            height: 520px;
+            z-index: 5;
+            margin-top: 20px auto;
+        }
+
+        /* Centro do Hub (Logo Central) */
+        .hub-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: var(--hub-center-size);
+            height: var(--hub-center-size);
+            background: #FFFFFF;
+            border: 15px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 150px rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            padding: 20px;
+        }
+
+        .hub-center img {
+            width: 125%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* --- ITEM DO NÓ --- */
+        .hub-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0; 
+            height: 0;
+            z-index: 30;
+        }
+
+        .hub-icon-wrapper {
+            position: absolute;
+            width: var(--icon-width);
+            height: var(--icon-height);
+            top: calc(var(--icon-height) / -2);
+            left: calc(var(--icon-width) / -2);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hub-icon-wrapper svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            overflow: visible;
+        }
+
+        /* Cor da borda do primeiro path do SVG */
+        .hub-item svg path:first-child {
+            stroke: var(--node-color) !important;
+            stroke-width: 2px !important; 
+        }
+
+        .hub-item:hover { z-index: 100; }
+        .hub-item:hover .hub-icon-wrapper {
+            transform: scale(1.15) rotate(var(--rotation));
+        }
+
+        /* --- NOVA LÓGICA DE TOOLTIPS (LINHAS RETAS) --- */
+        
+        /* Container que centraliza tudo no nó */
+        .tooltip-wrapper {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hub-item:hover .tooltip-wrapper {
+            opacity: 1;
+        }
+
+        /* 1. A Linha */
+        .tooltip-line {
+            height: 2px;
+            background-color: var(--node-color);
+            width: var(--line-length); /* Controlado pelo JS */
+            flex-shrink: 0; 
+            transition: width 0.3s ease;
+        }
+
+        /* 2. O Triângulo */
+        .tooltip-triangle {
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* 3. O Conteúdo */
+        .tooltip-content {
+            padding: 5px 0;
+        }
+        .tooltip-content ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .tooltip-content li {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 3px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+        .tooltip-content li::before {
+            content: '•';
+            color: var(--node-color);
+            font-size: 20px;
+            line-height: 0;
+        }
+
+        /* === DIREITA (Nós 8 a 14) === */
+        /* Ordem: [Ícone] -> [Linha] -> [Triangulo] -> [Texto] */
+        .hub-item.dir-right .tooltip-wrapper {
+            flex-direction: row;
+            left: calc(100% + 10px); /* Start from right edge of icon */
+            top: 50%;
+            transform: translateY(-50%) !important; /* Only vertical centering */
+        }
+
+        .hub-item.dir-right .tooltip-line {
+            width: var(--line-length);
+            transform: none !important; /* No rotation */
+        }
+
+        .hub-item.dir-right .tooltip-triangle {
+            border-width: 6px 8px 6px 0;
+            border-color: transparent var(--node-color) transparent transparent;
+        }
+        
+        .hub-item.dir-right .tooltip-content {
+            border-left: 2px solid var(--node-color);
+            padding-left: 10px;
+            text-align: left;
+        }
+        .hub-item.dir-right li::before { margin-right: 6px; }
+
+        /* === ESQUERDA (Nós 0 a 7) === */
+        /* Ordem: [Texto] <- [Triangulo] <- [Linha] <- [Ícone] */
+        .hub-item.dir-left .tooltip-wrapper {
+            flex-direction: row-reverse;
+            right: calc(100% + 10px); /* Start from left edge of icon */
+            top: 50%;
+            transform: translateY(-50%) !important; /* Only vertical centering */
+        }
+
+        .hub-item.dir-left .tooltip-line {
+            width: var(--line-length);
+            transform: none !important; /* No rotation */
+        }
+
+        .hub-item.dir-left .tooltip-triangle {
+            border-width: 6px 0 6px 8px;
+            border-color: transparent transparent transparent var(--node-color);
+        }
+
+        .hub-item.dir-left .tooltip-content {
+            border-right: 2px solid var(--node-color);
+            padding-right: 10px;
+            text-align: right;
+        }
+        
+        .hub-item.dir-left li { flex-direction: row-reverse; }
+        .hub-item.dir-left li::before { margin-left: 6px; }
+
+        /* Clientes */
+        .clients-section {
+            padding: 70px 20px 50px;
+            text-align: center;
+            background: var(--bg-color); 
+        }
+        .clients-section h2 {
+            color: #006EA7;
+            font-weight: 500;
+            font-size: 22px;
+            margin-bottom: 50px;
+        }
+        .clients-logos img {
+            max-width: 1000px;
+            width: 100%;
+            mix-blend-mode: multiply; 
+        }
+
+        /* Footer */
+        footer {
+            background: #006EA7;
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .footer-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: left;
+            gap: 40px;
+        }
+        
+        .footer-logo-area { 
+            text-align: center;
+            flex: 1; 
+            min-width: 250px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-logo-area img { 
+            max-width: 250px;
+            height: auto; 
+        }
+        
+        .footer-col { 
+            flex: 1;
+            min-width: 150px; 
+            font-size: 14px; 
+            line-height: 1.6; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-col h3 { 
+            font-size: 15px; 
+            margin-bottom: 15px; 
+            color: #81D4FA;
+            font-weight: 600;
+        }
+
+        .footer-col p { 
+            font-size: 16px;
+        }
+
+        .footer-col strong {
+            font-size: 25px;
+
+        }
+
+        .footer-col a { 
+            color: white; 
+            text-decoration: none; 
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 25px;
+            margin-top: 5px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        
+        .social-icons a svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        .social-icons a:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 900px) {
+            .hub-container { transform: scale(0.65); }
+            .hub-section { min-height: 600px; height: auto; padding: 50px 0; }
+            .footer-container { flex-direction: column; text-align: center; align-items: center;}
+            .footer-col { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="color-bar">
+        <div style="background: #FDCC0E;"></div>
+        <div style="background: #FE7104;"></div>
+        <div style="background: #ED3667;"></div>
+        <div style="background: #CA2096;"></div>
+        <div style="background: #6B5CC3;"></div>
+        <div style="background: #0A7BC0;"></div>
+        <div style="background: #47B247;"></div>
+        <div style="background: #34B6C4;"></div>
+        <div style="background: #E76B31;"></div>
+        <div style="background: #A5C243;"></div>
+    </div>
+
+    <div class="header-logo">
+        <img src="logo1.png" alt="Acontece HUB Logo"> 
+        <p class="tagline">Se você tem um desafio, nós podemos ajudar.</p>
+    </div>
+
+    <div class="hub-section">
+        
+        <p class="hub-subtitle">Somos compostos por diferentes talentos que se completam</p>
+
+        <div class="hub-container" id="hubContainer">
+            <div class="center-glow"></div>
+            <div class="ripple-container">
+                <div class="ripple"></div>
+                <div class="ripple"></div>
+                <div class="ripple"></div>
+            </div>
+
+            <div class="hub-center">
+                <img src="logo2.png" alt="Acontece HUB">
+            </div>
+            </div>
+    </div>
+
+    <div class="clients-section">
+        <h2>Clientes atendidos pelas empresas do Hub:</h2>
+        <div class="clients-logos">
+            <img src="clientes.png" alt="Logos de clientes"> 
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo-area">
+                <img src="logo3.png" alt="Acontece HUB">
+            </div>
+            
+            <div class="footer-col">
+                <h3>Endereço</h3>
+                <p><strong>São Paulo</strong><br>Av. Paulista, 807 / Cj 2315<br>Jardim Paulista – São Paulo/SP<br>CEP: 01411-000</p>
+                <br>
+                <p><strong>Salvador</strong><br>Av. Tancredo Neves, 274<br>Caminho das Árvores – Salvador/BA<br>CEP: 41820-020</p>
+            </div>
+
+            <div class="footer-col">
+                <h3>Fale conosco</h3>
+                <p><strong>São Paulo/SP</strong></p>
+                <p>(11) 3042-2687</p>
+                <br>
+                <h3>Siga-nos</h3>
+                <div class="social-icons">
+                    <a href="#" target="_blank" aria-label="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a href="#" target="_blank" aria-label="Facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </a>
+                    <a href="#" target="_blank" aria-label="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="#" target="_blank" aria-label="X">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+                    </a>
+                    <a href="#" target="_blank" aria-label="YouTube">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186c-.273-1.021-1.075-1.823-2.096-2.096-1.85-.497-9.273-.497-9.273-.497s-7.423 0-9.273.497c-1.021.273-1.823 1.075-2.096 2.096-.497 1.85-.497 5.715-.497 5.715s0 3.865.497 5.715c.273 1.021 1.075 1.823 2.096 2.096 1.85.497 9.273.497 9.273.497s7.423 0 9.273-.497c1.021-.273 1.823-1.075 2.096-2.096.497-1.85.497-5.715.497-5.715s0-3.865-.497-5.715zm-13.891 9.146v-6.664l5.854 3.332-5.854 3.332z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const TOTAL_NODES = 15;
+        const RADIUS = 215; 
+        
+        const nodesData = [
+            { id: 0, label: 'press', color: '#FDCC0E', lineLength: 80, services: ['Assessoria de Imprensa', 'Advocacy de mercado'] },
+            { id: 1, label: 'SIC', color: '#34B6C4', lineLength: 60, services: ['Tech & Spaces', 'Cultura Corporativa'] },
+            { id: 2, label: '03', color: '#0A7BC0', lineLength: 100, services: ['Consultoria', 'Mentoria', 'Planejamento'] },
+            { id: 3, label: '04', color: '#34B6C4', lineLength: 50, services: ['Educação Corporativa', 'Plataforma de Ensino'] },
+            { id: 4, label: '05', color: '#6B5CC3', lineLength: 70, services: ['Motion Graphics', 'Efeitos Especiais'] },
+            { id: 5, label: '06', color: '#222222', lineLength: 90, services: ['Realidade Virtual (VR)', 'Tour Virtual 360º'] },
+            { id: 6, label: '07', color: '#ED3667', lineLength: 60, services: ['Automação de Mkt', 'Captura de Leads'] },
+            { id: 7, label: '08', color: '#222222', lineLength: 110, services: ['Inteligência Artificial', 'Desenvolvimento'] },
+            { id: 8, label: 'Ludy', color: '#CA2096', lineLength: 60, services: ['Branding', 'Social Media', 'Marketing Digital'] },
+            { id: 9, label: 'TAO', color: '#FE7104', lineLength: 80, services: ['Agência Digital', 'Apps e Sistemas'] },
+            { id: 10, label: 'LIRIO', color: '#FDCC0E', lineLength: 50, services: ['Conteúdo Audiovisual', 'Podcast & Videocast'] },
+            { id: 11, label: 'CROWN', color: '#6B5CC3', lineLength: 70, services: ['Jornada do Cliente', 'CRM & Relacionamento'] },
+            { id: 12, label: 'CURIN', color: '#222222', lineLength: 90, services: ['Banco de Imagens', 'Fotografia'] },
+            { id: 13, label: 'Hide', color: '#fff', lineLength: 0, services: [] },
+            { id: 14, label: 'Hide', color: '#fff', lineLength: 0, services: [] }
+        ];
+
+        const svgIcon = `
+        <svg viewBox="0 0 179 113" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+            <path d="M123.841,65.858c3.921,10.575 14.1,18.111 26.04,18.111c15.334,0 27.765,-12.43 27.765,-27.763c0,-15.335 -12.431,-27.763 -27.765,-27.763c-11.943,0 -22.123,7.543 -26.042,18.123c-1.106,2.416 -3.544,4.095 -6.378,4.095c-3.216,0 -5.927,-2.169 -6.751,-5.126c-4.976,-25.561 -27.486,-44.856 -54.504,-44.856c-30.667,0 -55.527,24.86 -55.527,55.527c0,30.666 24.86,55.528 55.527,55.527c27.014,0.001 49.521,-19.29 54.502,-44.844c0.823,-2.956 3.537,-5.127 6.753,-5.127c2.835,0 5.274,1.679 6.38,4.096Z" style="fill:#fff;fill-rule:nonzero;stroke:#95a5a6;stroke-width:1.36px;"/>
+            <path d="M125.868,55.774c-0,13.323 10.817,24.139 24.139,24.139c13.323,0 24.14,-10.816 24.14,-24.139c0,-13.323 -10.817,-24.139 -24.139,-24.139c-13.323,-0 -24.14,10.816 -24.14,24.139Z" style="fill:#e6e6e6;"/>
+            <path d="M171.402,55.775c0,11.815 -9.578,21.394 -21.394,21.394c-11.815,0 -21.394,-9.579 -21.394,-21.394c0,-11.815 9.579,-21.394 21.394,-21.394c11.816,0 21.394,9.579 21.394,21.394" style="fill:#f9f9f9;fill-rule:nonzero;"/>
+        </svg>
+        `;
+
+        const container = document.getElementById('hubContainer');
+        const angleStep = 360 / TOTAL_NODES; 
+
+        nodesData.forEach((node, index) => {
+            if (index === 13 || index === 14) return;
+
+            let angleDeg = -90 - (index * angleStep);
+            let angleRad = angleDeg * (Math.PI / 180);
+
+            const x = Math.cos(angleRad) * RADIUS;
+            const y = Math.sin(angleRad) * RADIUS;
+            const rotation = angleDeg + 180;
+
+            const directionClass = (index <= 7) ? 'dir-left' : 'dir-right';
+
+            const el = document.createElement('div');
+            el.className = `hub-item ${directionClass}`;
+            
+            el.style.setProperty('--node-color', node.color);
+            el.style.setProperty('--rotation', rotation + 'deg');
+            el.style.setProperty('--line-length', node.lineLength + 'px');
+            
+            el.style.left = `calc(50% + ${x}px)`;
+            el.style.top = `calc(50% + ${y}px)`;
+
+            el.innerHTML = `
+                <div class="hub-icon-wrapper" style="transform: rotate(${rotation}deg); position: relative;">
+                    ${svgIcon}
+                    
+                    <!-- Tooltip positioned relative to the icon -->
+                    <div class="tooltip-wrapper">
+                        <div class="tooltip-line"></div>
+                        <div class="tooltip-triangle"></div>
+                        <div class="tooltip-content">
+                            <ul>
+                                ${node.services.map(s => `<li>${s}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(el);
+        });
+    </script>
+</body>
+</html>
