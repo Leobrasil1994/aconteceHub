@@ -8,8 +8,8 @@
         :root {
             --bg-color: #FFFFFF;
             --hub-center-size: 200px;
-            --icon-width: 100px;
-            --icon-height: 62px;
+            --icon-width: 140px;
+            --icon-height: 87px;
         }
 
         * {
@@ -25,7 +25,6 @@
             color: #333;
         }
 
-        /* 1. Linha arco-iris */
         .color-bar {
             width: 100%;
             height: 20px;
@@ -35,7 +34,6 @@
         }
         .color-bar > div { flex: 1; }
 
-        /* 2. Header */
         .header-logo {
             text-align: center;
             padding: 200px 20px 40px; 
@@ -49,7 +47,6 @@
             height: auto;
         }
 
-        /* 3. Sub-titulo */
         .tagline {
             color: #006EA7;
             font-size: 22px;
@@ -59,7 +56,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 4. Sub-titulo hub */
         .hub-subtitle {
             text-align: center;
             color: #006EA7;
@@ -71,7 +67,6 @@
             width: 100%;
         }
 
-        /* 5. Hub radial */
         .hub-section {
             position: relative;
             width: 100%;
@@ -84,7 +79,6 @@
             padding: 20px 0;
         }
 
-        /* Efeito de Ondas (Background Pulsante) */
         .ripple-container {
             position: absolute;
             top: 50%;
@@ -96,13 +90,12 @@
             pointer-events: none;
         }
 
-        /* Glow Central */
         .center-glow {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 680px; /* Aumentado levemente conforme ajuste anterior */
+            width: 680px;
             height: 680px;
             z-index: -1;
 
@@ -114,7 +107,7 @@
                 rgba(100, 168, 255, 0.0) 75%   
             );
 
-            filter: blur(60px); /* Ajustado para deixar mais denso */
+            filter: blur(60px);
             opacity: 1;
             border-radius: 50%;
             pointer-events: none;
@@ -142,16 +135,15 @@
             100% { width: 850px; height: 850px; opacity: 0; border-width: 0px; }
         }
 
-        /* Container Principal do Hub */
         .hub-container {
             position: relative;
             width: 520px;
             height: 520px;
             z-index: 5;
-            margin-top: 20px auto;
+            margin: 20px auto;
+            transform-style: preserve-3d;
         }
 
-        /* Centro do Hub (Logo Central) */
         .hub-center {
             position: absolute;
             top: 50%;
@@ -160,30 +152,78 @@
             width: var(--hub-center-size);
             height: var(--hub-center-size);
             background: #FFFFFF;
-            border: 15px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 150px rgba(255, 255, 255, 0.9);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 20;
+            z-index: 50;
             padding: 20px;
+            overflow: hidden;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
-        .hub-center img {
-            width: 125%;
+        .hub-center img.default-logo {
+            width: 95%;
             height: auto;
             object-fit: contain;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+            position: absolute;
         }
 
-        /* --- ITEM DO NÓ --- */
+        .hub-center-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.3s ease 0.1s;
+            padding: 15px;
+            text-align: center;
+            background: white;
+        }
+
+        .hub-center-content ul {
+            list-style: disc;
+            padding-left: 15px;
+            padding-top: 45px;
+            margin: 0;
+            text-align: left;
+            width: 95%;
+            margin-left: 5%;
+            display: inline-block;
+        }
+
+        .hub-center-content li {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .hub-center.active .default-logo {
+            opacity: 0;
+        }
+        .hub-center.active .hub-center-content {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         .hub-item {
             position: absolute;
             top: 50%;
             left: 50%;
             width: 0; 
             height: 0;
-            z-index: 30;
+            z-index: 40;
+            pointer-events: none;
         }
 
         .hub-icon-wrapper {
@@ -193,10 +233,12 @@
             top: calc(var(--icon-height) / -2);
             left: calc(var(--icon-width) / -2);
             cursor: pointer;
+            pointer-events: auto;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 45;
         }
 
         .hub-icon-wrapper svg {
@@ -206,148 +248,61 @@
             overflow: visible;
         }
 
-        /* Cor da borda do primeiro path do SVG */
-        .hub-item svg path:first-child {
-            stroke: var(--node-color) !important;
-            stroke-width: 2px !important; 
-        }
-
-        .hub-item:hover { z-index: 100; }
-        .hub-item:hover .hub-icon-wrapper {
+        .hub-icon-wrapper:hover {
             transform: scale(1.15) rotate(var(--rotation));
         }
 
-        /* --- NOVA LÓGICA DE TOOLTIPS (LINHAS RETAS) --- */
-        
-        /* Container que centraliza tudo no nó */
-        .tooltip-wrapper {
+        .connector-line {
             position: absolute;
-            display: flex;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .hub-item:hover .tooltip-wrapper {
-            opacity: 1;
-        }
-
-        /* 1. A Linha */
-        .tooltip-line {
-            height: 2px;
+            top: 0;
+            left: 0;
+            height: 4px;
             background-color: var(--node-color);
-            width: var(--line-length); /* Controlado pelo JS */
-            flex-shrink: 0; 
-            transition: width 0.3s ease;
+            width: 0px;
+            transform-origin: left center;
+            transform: rotate(var(--rotation)); 
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 35;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        /* 2. O Triângulo */
-        .tooltip-triangle {
-            width: 0;
-            height: 0;
-            border-style: solid;
+        .hub-item.active .connector-line {
+            width: 130px;
         }
 
-        /* 3. O Conteúdo */
-        .tooltip-content {
-            padding: 5px 0;
-        }
-        .tooltip-content ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .tooltip-content li {
-            font-size: 15px;
-            color: #555;
-            margin-bottom: 3px;
-            font-weight: 600;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-        }
-        .tooltip-content li::before {
-            content: '•';
-            color: var(--node-color);
-            font-size: 20px;
-            line-height: 0;
-        }
-
-        /* === DIREITA (Nós 8 a 14) === */
-        /* Ordem: [Ícone] -> [Linha] -> [Triangulo] -> [Texto] */
-        .hub-item.dir-right .tooltip-wrapper {
-            flex-direction: row;
-            left: calc(100% + 10px); /* Start from right edge of icon */
+        .node-internal-img {
+            position: absolute;
+            z-index: 10;         
+            width: 62px;  
+            height: 62px;
             top: 50%;
-            transform: translateY(-50%) !important; /* Only vertical centering */
+            left: 12px;
+            transform: translateY(-50%) rotate(calc(var(--rotation) * -1));
+            object-fit: contain;
+            pointer-events: none;
+            mix-blend-mode: normal;
         }
 
-        .hub-item.dir-right .tooltip-line {
-            width: var(--line-length);
-            transform: none !important; /* No rotation */
-        }
-
-        .hub-item.dir-right .tooltip-triangle {
-            border-width: 6px 8px 6px 0;
-            border-color: transparent var(--node-color) transparent transparent;
-        }
-        
-        .hub-item.dir-right .tooltip-content {
-            border-left: 2px solid var(--node-color);
-            padding-left: 10px;
-            text-align: left;
-        }
-        .hub-item.dir-right li::before { margin-right: 6px; }
-
-        /* === ESQUERDA (Nós 0 a 7) === */
-        /* Ordem: [Texto] <- [Triangulo] <- [Linha] <- [Ícone] */
-        .hub-item.dir-left .tooltip-wrapper {
-            flex-direction: row-reverse;
-            right: calc(100% + 10px); /* Start from left edge of icon */
-            top: 50%;
-            transform: translateY(-50%) !important; /* Only vertical centering */
-        }
-
-        .hub-item.dir-left .tooltip-line {
-            width: var(--line-length);
-            transform: none !important; /* No rotation */
-        }
-
-        .hub-item.dir-left .tooltip-triangle {
-            border-width: 6px 0 6px 8px;
-            border-color: transparent transparent transparent var(--node-color);
-        }
-
-        .hub-item.dir-left .tooltip-content {
-            border-right: 2px solid var(--node-color);
-            padding-right: 10px;
-            text-align: right;
-        }
-        
-        .hub-item.dir-left li { flex-direction: row-reverse; }
-        .hub-item.dir-left li::before { margin-left: 6px; }
-
-        /* Clientes */
         .clients-section {
             padding: 70px 20px 50px;
             text-align: center;
             background: var(--bg-color); 
         }
+
         .clients-section h2 {
             color: #006EA7;
             font-weight: 500;
             font-size: 22px;
             margin-bottom: 50px;
         }
+
         .clients-logos img {
             max-width: 1000px;
             width: 100%;
             mix-blend-mode: multiply; 
         }
 
-        /* Footer */
         footer {
             background: #006EA7;
             color: white;
@@ -423,7 +378,6 @@
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        
         .social-icons a svg {
             width: 100%;
             height: 100%;
@@ -475,10 +429,14 @@
                 <div class="ripple"></div>
             </div>
 
-            <div class="hub-center">
-                <img src="logo2.png" alt="Acontece HUB">
+            <div class="hub-center" id="hubCenter">
+                <img src="logo2.png" alt="Acontece HUB" class="default-logo">
+                
+                <div class="hub-center-content" id="hubContent">
+                    <ul id="hubServicesList"></ul>
+                </div>
             </div>
-            </div>
+        </div>
     </div>
 
     <div class="clients-section">
@@ -533,32 +491,35 @@
         const RADIUS = 215; 
         
         const nodesData = [
-            { id: 0, label: 'press', color: '#FDCC0E', lineLength: 80, services: ['Assessoria de Imprensa', 'Advocacy de mercado'] },
-            { id: 1, label: 'SIC', color: '#34B6C4', lineLength: 60, services: ['Tech & Spaces', 'Cultura Corporativa'] },
-            { id: 2, label: '03', color: '#0A7BC0', lineLength: 100, services: ['Consultoria', 'Mentoria', 'Planejamento'] },
-            { id: 3, label: '04', color: '#34B6C4', lineLength: 50, services: ['Educação Corporativa', 'Plataforma de Ensino'] },
-            { id: 4, label: '05', color: '#6B5CC3', lineLength: 70, services: ['Motion Graphics', 'Efeitos Especiais'] },
-            { id: 5, label: '06', color: '#222222', lineLength: 90, services: ['Realidade Virtual (VR)', 'Tour Virtual 360º'] },
-            { id: 6, label: '07', color: '#ED3667', lineLength: 60, services: ['Automação de Mkt', 'Captura de Leads'] },
-            { id: 7, label: '08', color: '#222222', lineLength: 110, services: ['Inteligência Artificial', 'Desenvolvimento'] },
-            { id: 8, label: 'Ludy', color: '#CA2096', lineLength: 60, services: ['Branding', 'Social Media', 'Marketing Digital'] },
-            { id: 9, label: 'TAO', color: '#FE7104', lineLength: 80, services: ['Agência Digital', 'Apps e Sistemas'] },
-            { id: 10, label: 'LIRIO', color: '#FDCC0E', lineLength: 50, services: ['Conteúdo Audiovisual', 'Podcast & Videocast'] },
-            { id: 11, label: 'CROWN', color: '#6B5CC3', lineLength: 70, services: ['Jornada do Cliente', 'CRM & Relacionamento'] },
-            { id: 12, label: 'CURIN', color: '#222222', lineLength: 90, services: ['Banco de Imagens', 'Fotografia'] },
-            { id: 13, label: 'Hide', color: '#fff', lineLength: 0, services: [] },
-            { id: 14, label: 'Hide', color: '#fff', lineLength: 0, services: [] }
+            { id: 0, label: 'press', img: 'logo-node0.png', color: '#1C1C1C', fillColor: '#1C1C1C', services: ['Assessoria de Imprensa', 'Advocacy de mercado'] },
+            { id: 1, label: 'SIC', img: 'logo-node1.png', color: '#C8469A', services: ['Tech & Spaces', 'Cultura Corporativa'] },
+            { id: 2, label: '03', img: 'logo-node2.png', color: '#F9B515', services: ['Consultoria', 'Mentoria', 'Planejamento'] },
+            { id: 3, label: '04', img: 'logo-node3.png', color: '#F26322', fillColor: '#F26322', services: ['Educação Corporativa', 'Plataforma de Ensino'] },
+            { id: 4, label: '05', img: 'logo-node4.png', color: '#95A5A6', services: ['Motion Graphics', 'Efeitos Especiais'] },
+            { id: 5, label: '06', img: 'logo-node5.png', color: '#000000', services: ['Realidade Virtual (VR)', 'Tour Virtual 360º'] },
+            { id: 6, label: '07', img: 'logo-node6.png', color: '#A6278E', services: ['Automação de Mkt', 'Captura de Leads'] },
+            { id: 7, label: '08', img: 'logo-node7.png', color: '#1C9CD8', fillColor: '#221F1F', services: ['Inteligência Artificial', 'Desenvolvimento'] },
+            { id: 8, label: 'Ludy', img: 'logo-node8.png', color: '#5B4C99', services: ['Branding', 'Social Media', 'Marketing Digital'] },
+            { id: 9, label: 'TAO', img: 'logo-node9.png', color: '#047069', services: ['Agência Digital', 'Apps e Sistemas'] },
+            { id: 10, label: 'LIRIO', img: 'logo-node10.png', color: '#1C9CD8', services: ['Conteúdo Audiovisual', 'Podcast & Videocast'] },
+            { id: 11, label: 'CROWN', img: 'logo-node11.png', color: '#0EB1B1', services: ['Jornada do Cliente', 'CRM & Relacionamento'] },
+            { id: 12, label: 'CURIN', img: 'logo-node12.png', color: '#FADC21', fillColor: '#FADC21', services: ['Banco de Imagens', 'Fotografia'] },
+            { id: 13, label: 'Hide', img: '', color: '#fff', services: [] },
+            { id: 14, label: 'Hide', img: '', color: '#fff', services: [] }
         ];
 
         const svgIcon = `
-        <svg viewBox="0 0 179 113" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
-            <path d="M123.841,65.858c3.921,10.575 14.1,18.111 26.04,18.111c15.334,0 27.765,-12.43 27.765,-27.763c0,-15.335 -12.431,-27.763 -27.765,-27.763c-11.943,0 -22.123,7.543 -26.042,18.123c-1.106,2.416 -3.544,4.095 -6.378,4.095c-3.216,0 -5.927,-2.169 -6.751,-5.126c-4.976,-25.561 -27.486,-44.856 -54.504,-44.856c-30.667,0 -55.527,24.86 -55.527,55.527c0,30.666 24.86,55.528 55.527,55.527c27.014,0.001 49.521,-19.29 54.502,-44.844c0.823,-2.956 3.537,-5.127 6.753,-5.127c2.835,0 5.274,1.679 6.38,4.096Z" style="fill:#fff;fill-rule:nonzero;stroke:#95a5a6;stroke-width:1.36px;"/>
+        <svg viewBox="0 0 179 113" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+            <path class="node-bg" d="M123.841,65.858c3.921,10.575 14.1,18.111 26.04,18.111c15.334,0 27.765,-12.43 27.765,-27.763c0,-15.335 -12.431,-27.763 -27.765,-27.763c-11.943,0 -22.123,7.543 -26.042,18.123c-1.106,2.416 -3.544,4.095 -6.378,4.095c-3.216,0 -5.927,-2.169 -6.751,-5.126c-4.976,-25.561 -27.486,-44.856 -54.504,-44.856c-30.667,0 -55.527,24.86 -55.527,55.527c0,30.666 24.86,55.528 55.527,55.527c27.014,0.001 49.521,-19.29 54.502,-44.844c0.823,-2.956 3.537,-5.127 6.753,-5.127c2.835,0 5.274,1.679 6.38,4.096Z" style="fill:#fff;fill-rule:nonzero;stroke:#95a5a6;stroke-width:1.36px;"/>
             <path d="M125.868,55.774c-0,13.323 10.817,24.139 24.139,24.139c13.323,0 24.14,-10.816 24.14,-24.139c0,-13.323 -10.817,-24.139 -24.139,-24.139c-13.323,-0 -24.14,10.816 -24.14,24.139Z" style="fill:#e6e6e6;"/>
             <path d="M171.402,55.775c0,11.815 -9.578,21.394 -21.394,21.394c-11.815,0 -21.394,-9.579 -21.394,-21.394c0,-11.815 9.579,-21.394 21.394,-21.394c11.816,0 21.394,9.579 21.394,21.394" style="fill:#f9f9f9;fill-rule:nonzero;"/>
         </svg>
         `;
 
         const container = document.getElementById('hubContainer');
+        const hubCenter = document.getElementById('hubCenter');
+        const hubList = document.getElementById('hubServicesList');
+        
         const angleStep = 360 / TOTAL_NODES; 
 
         nodesData.forEach((node, index) => {
@@ -571,34 +532,52 @@
             const y = Math.sin(angleRad) * RADIUS;
             const rotation = angleDeg + 180;
 
-            const directionClass = (index <= 7) ? 'dir-left' : 'dir-right';
-
             const el = document.createElement('div');
-            el.className = `hub-item ${directionClass}`;
-            
+            el.className = 'hub-item';
             el.style.setProperty('--node-color', node.color);
             el.style.setProperty('--rotation', rotation + 'deg');
-            el.style.setProperty('--line-length', node.lineLength + 'px');
             
             el.style.left = `calc(50% + ${x}px)`;
             el.style.top = `calc(50% + ${y}px)`;
 
             el.innerHTML = `
-                <div class="hub-icon-wrapper" style="transform: rotate(${rotation}deg); position: relative;">
+                <div class="connector-line"></div>
+                <div class="hub-icon-wrapper" style="transform: rotate(${rotation}deg);">
                     ${svgIcon}
-                    
-                    <!-- Tooltip positioned relative to the icon -->
-                    <div class="tooltip-wrapper">
-                        <div class="tooltip-line"></div>
-                        <div class="tooltip-triangle"></div>
-                        <div class="tooltip-content">
-                            <ul>
-                                ${node.services.map(s => `<li>${s}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
+                    <img src="${node.img}" class="node-internal-img" alt="">
                 </div>
             `;
+
+            const iconWrapper = el.querySelector('.hub-icon-wrapper');
+
+            iconWrapper.addEventListener('mouseenter', () => {
+                el.classList.add('active');
+                hubCenter.style.borderColor = node.color;
+                hubCenter.style.boxShadow = `0 0 30px ${node.color}40`;
+                hubList.innerHTML = node.services.map(s => `<li>${s}</li>`).join('');
+                hubCenter.classList.add('active');
+            });
+
+            iconWrapper.addEventListener('mouseleave', () => {
+                el.classList.remove('active');
+                hubCenter.style.borderColor = 'rgba(0, 110, 167, 0.1)';
+                hubCenter.style.boxShadow = '0 0 60px rgba(0, 0, 0, 0.05)';
+                hubCenter.classList.remove('active');
+            });
+
+            // --- UPDATED COLOR LOGIC ---
+            // Target the first path (the main background)
+            const mainPath = el.querySelector('svg path'); 
+            if(mainPath) {
+                // Set the Stroke
+                mainPath.style.stroke = node.color;
+                mainPath.style.strokeWidth = "2px";
+
+                // Set the Fill (if fillColor exists in data, otherwise defaults to white)
+                if (node.fillColor) {
+                    mainPath.style.fill = node.fillColor;
+                }
+            }
 
             container.appendChild(el);
         });
